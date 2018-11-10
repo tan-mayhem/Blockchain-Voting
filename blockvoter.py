@@ -1,14 +1,9 @@
-import datetime
-import time
+import hashlib
 
-def returncurrentdate():
-	now = datetime.datetime.now()
-	return now
-
-c = returncurrentdate() 
-time.sleep(1)
-d = returncurrentdate() 
-
-print(c) 
-
-print(d) 
+class Block:
+	def next_block(last_block):
+		this_index = last_block.index + 1
+		this_timestamp = date.datetime.now() 
+		this_data = "Voter Number : " + str(this_index) 
+		this_hash = last_block.hash
+		return Block(this_index,this_timestamp, this_data, this_hash)
