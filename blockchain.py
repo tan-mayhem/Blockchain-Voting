@@ -43,3 +43,15 @@ class Block():
         print("4. " + " Person 4 ")
         print("5. " + " Person 5 ")
         return(str(input("Enter your vote: ")))
+
+    blockchain = [createGenesisBlock()]
+    previous_block = blockchain[0]
+
+    number_blocks = 20
+
+    for i in range(0, number_blocks):
+      block_to_add = next_block(previous_block)
+      blockchain.append(block_to_add)
+      previous_block = block_to_add
+      print("Block #{} has been added to the blockchain!".format(block_to_add.index))
+    print("Hash: {}\n".format(block_to_add.currentHash))
