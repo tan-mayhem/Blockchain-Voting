@@ -21,9 +21,6 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         text = self.request.recv(1024).strip()
         text_obj = json.loads(text)
-        print("{} wrote: {}".format(
-            self.client_address[0], text,
-        ))
         nodes = self.server.nodes
         nodes.add_node(text_obj["host"], text_obj["port"])
         json_obj = {}
@@ -50,7 +47,6 @@ def start_client(myHost, myPort, destHost, destPort, nodes):
     data = { "host": myHost, "port": myPort }
     s.sendall(json.dumps(data))
     r = s.recv(1024)
-    print(r)
     r_data = json.loads(r)
     nodes.set_nodes(r_data.get("nodes"))
     print(nodes.myNodes)
