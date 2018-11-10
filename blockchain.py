@@ -1,7 +1,7 @@
 import hashlib
 import time
 
-class Block():
+class Block:
     def __init__(self, index, timeStamp, voterId, voterPassword, vote, previousHash):
         self.index = index
         self.timeStamp = timeStamp
@@ -19,30 +19,33 @@ class Block():
     def createGenesisBlock():
         voterId = str(input("Enter your Voter ID: "))
         voterPassword = str(input("Enter your password: "))
-        time.sleep(5)
-        print("Candidates for the House")
-        vote = candidateVote()
+        time.sleep(1)
+        print "Candidates for the House"
+        print "Index " + " Name "
+        print "1. " + " Person 1 "
+        print "2. " + " Person 2 "
+        print "3. " + " Person 3 "
+        print "4. " + " Person 4 "
+        print "5. " + " Person 5 "
+        vote = str(input("Enter your vote: "))
         return Block(0, date.datetime.now(), voterId, voterPassword, vote, "0")
 
     def next_block(last_block):
-		voterId = str(input("Enter your Voter ID "))
-		voterPassword = str(input("Enter your password: "))
-		time.sleep(5)
-		print("Candidates for the House")
-        vote = candidateVote()
-		this_index = last_block.index + 1
-		this_timestamp = date.datetime.now()
-		previousHash = last_block.currentHash
-		return Block(this_index, this_timestamp, voterId, voterPassword, vote, previousHash)
-
-    def candidateVote():
-        print("Index " + " Name ")
-        print("1. " + " Person 1 ")
-        print("2. " + " Person 2 ")
-        print("3. " + " Person 3 ")
-        print("4. " + " Person 4 ")
-        print("5. " + " Person 5 ")
-        return(str(input("Enter your vote: ")))
+        voterId = str(input("Enter your Voter ID: "))
+        voterPassword = str(input("Enter your password: "))
+        time.sleep(1)
+        print "Candidates for the House"
+        print "Index " + " Name "
+        print "1. " + " Person 1 "
+        print "2. " + " Person 2 "
+        print "3. " + " Person 3 "
+        print "4. " + " Person 4 "
+        print "5. " + " Person 5 "
+        vote = str(input("Enter your vote: "))
+        this_index = last_block.index + 1
+        this_timestamp = date.datetime.now()
+        previousHash = last_block.currentHash
+        return Block(this_index, this_timestamp, voterId, voterPassword, vote, previousHash)
 
     blockchain = [createGenesisBlock()]
     previous_block = blockchain[0]
@@ -53,5 +56,5 @@ class Block():
       block_to_add = next_block(previous_block)
       blockchain.append(block_to_add)
       previous_block = block_to_add
-      print("Block #{} has been added to the blockchain!".format(block_to_add.index))
-    print("Hash: {}\n".format(block_to_add.currentHash))
+      print "Block #{} has been added to the blockchain!".format(block_to_add.index)
+    print "Hash: {}\n".format(block_to_add.currentHash)
