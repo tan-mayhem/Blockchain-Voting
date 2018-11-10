@@ -1,6 +1,8 @@
 import hashlib
 import time
 import datetime as date
+from ctypes import string_at
+from binascii import hexlify
 
 class Block:
     def __init__(self, index, timeStamp, voterId, voterPassword, vote, previousHash):
