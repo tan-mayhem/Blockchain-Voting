@@ -131,7 +131,8 @@ def main():
 
     # Wait for ctrl-c interrupt
     try:
-        signal.pause()
+    	while True:
+        	time.sleep(1) ;
     except KeyboardInterrupt:
         pass
 
