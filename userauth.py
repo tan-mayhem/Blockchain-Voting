@@ -56,8 +56,8 @@ def enter(voterId, voterPassword, bc):
 
     all_voters = db.child("voters").get()
     for voter in all_voters.each():
-        vId = voter.val()['voterid']
-        vPs = voter.val()['password']
+        vId = str(voter.val()['voterid'])
+        vPs = str(voter.val()['password'])
         if voterId == vId and voterPassword == vPs:
             k = 1
             break
