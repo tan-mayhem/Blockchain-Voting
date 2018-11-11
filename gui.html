@@ -5,29 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link rel="icon" href="../../../../favicon.ico">
-
-    <title>Voter Registration</title>
-
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="css/mdb.css" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono" rel="stylesheet">
     <!-- Bootstrap core CSS -->
     <link href="../../../../dist/css/bootstrap-material-design.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="carousel.css" rel="stylesheet">
+
+    <style type="text/css">
+      html,
+      body,
+      header,
+      .view {
+        height: 100%;
+      }
+
+    </style>
+
+    <title>Voter Registration</title>
 
     <!-- Custom styles for this template -->
     <link href="signin.css" rel="stylesheet">
   </head>
 
-  <body class="text-center">
+  <body class="text-center bg-dark text-white">
     <form class="form-signin">
       <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
-      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-      <label for="inputEmail" class="sr-only">Voter ID</label>
-      <input type="email" id="inputEmail" class="form-control" placeholder="Voter ID" required autofocus>
+      <h3 class="text-center">
+        <strong><big>Voter Registration</big></strong>
+      </h3>
+      <label for="inputVoterID" class="sr-only">Voter ID</label>
+      <input type="text" id="inputEmail" class="form-control" placeholder="Voter ID" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
       <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-      <a href="candidates.html" target="_blank">
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
-      </a>
-      </li>
+      <button class="btn btn-md btn-primary btn-block" type="submit">Submit</button>
     </form>
   </body>
 </html>
