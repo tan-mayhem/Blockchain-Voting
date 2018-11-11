@@ -87,17 +87,19 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     # Receive list of nodes in network and blockchain
     r = s.recv(1024)
     r_data = json.loads(r)
+
+    # Show candidates 
+    candidateNames = r_data.get("candidateNames")[:] 
+    print "The candidates are : " 
+    for p in range(0,n):
+            print str(p+1) + ". "  + candidateNames[p] 	
+
     nodes = r_data.get("nodes")[:]
     bc = (r_data.get("blockchain"))
     b = next_block_from_array(bc[-1]).block_to_array()
     bc.append(b)
 
     if enter(b[1], b[2], bc):
-        candidateNames = r_data.get("candidateNames")[:]
-	for m in range(len(candidateNames)):
-		bleh = str(raw_input("candidate number " + str(m) + "\'s name : "))
-		candidateNames.append(bleh)
-
         s.close()
         
         q_nodes.put(nodes)
