@@ -1,7 +1,7 @@
 import hashlib
 import time
 import datetime as date
-from userauth import create, enter
+from userauth import enter
 
 class Block:
     def __init__(self, index, timeStamp, voterId, voterPassword, vote, previousHash):
