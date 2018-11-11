@@ -105,14 +105,16 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
 def checkwinner():
 	bc = q_bc.get() 
 	for i in range(0,len(bc)):
-		a = int(bc[i][3]) - 1
-		winnerarr[a] = winnerarr[a] + 1
+            a = int(bc[i][3]) - 1
+            winnerarr[a] = winnerarr[a] + 1
 	print winnerarr
 	max = -1
+        winner = -1
 	for j in range(0,len(winnerarr)):
 		if winnerarr[j] > max:
-			max = j 
-	print "The winner is candidate : " + str((max+1)) 
+                    max = winnerarr[j]
+                    winner = j
+	print "The winner is candidate : " + str(winner)
 
 
 
