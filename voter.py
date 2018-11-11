@@ -108,7 +108,7 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
         send_blockchain_to_network(b, nodes)
     else:
         print("Warning: you are not a valid voter")
-        sys.exit()
+        s.close()
     print("Please wait for other voters...\nPress ctrl-c when election ends.")
 
 def checkwinner(names):
