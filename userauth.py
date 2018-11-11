@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import base64
 import getpass
+#from databaseauth import databaseinfo
+
 def create():
     username = "0"
     file = open("userpass.txt","a")
@@ -15,21 +17,18 @@ def create():
             file.write(username+","+cr+'\n')
     file.close()
 
-
-def enter():
-    up_username = str(raw_input("Username: ").strip())
-    up_password = password = getpass.getpass().strip()
-    enc_pass = base64.encodestring(up_password)
+def enter(voterID, voterPassword):
+    encodedPassword = base64.encodestring(voterPassword)
     with open("userpass.txt","r") as f:
         for line in f:
-            if line.split(",")[0] == up_username and line.split(",")[1] == enc_pass:
+            if line.split(",")[0] == voterID and line.split(",")[1] == encodedPassword:
                 return True
         return False
-choice = str(raw_input("Add new usernames/passwords or login --> Enter [1 or 2]"))
-if choice=="1":  
-    create()
-else:
-    if enter():
-        print("Logged in!")
-    else:
-        print("Incorrect!")
+#choice = str(raw_input("Add new usernames/passwords or login --> Enter [1 or 2]"))
+#if choice=="1":
+    #create()
+#else:
+    #if enter():
+        #print("Logged in!")
+    #else:
+        #print("Incorrect!")
