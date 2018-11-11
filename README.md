@@ -1,5 +1,5 @@
 # Chain-Voting
-Blockchain voting project for Madhacks 2018
+Blockchain voting project for MadHacks 2018
 
 # Contributers:
 1. Andrew Corum
@@ -10,13 +10,13 @@ Blockchain voting project for Madhacks 2018
 # Instructions:
 1. Install packages and other dependencies,
 
-   pip install pyrebase,
+   pip install pyrebase
              
    pip install firebase-admin
              
 2. Clone repository and distribute voter.py to voters
 
-3. Update the firebase database using the credentials provided
+3. Update the Firebase database using the credentials provided
 
 4. First run voter.py yourself as the Genesis block (that is, the first node) and cast your vote
 
