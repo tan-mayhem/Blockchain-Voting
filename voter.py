@@ -7,11 +7,15 @@ import time
 import random
 import sys
 import json
+import Queue
 
 from blockchain import Block, createGenesisBlock, next_block_from_array
 
 bc = list()
+q_bc = Queue.Queue()
+
 nodes = list()
+q_nodes = Queue.Queue()
 
 class ConnectionHandler(SocketServer.BaseRequestHandler):
     def handle(self):
@@ -19,23 +23,30 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
         text = self.request.recv(1024).strip()
         text_obj = json.loads(text)
 
-        nodes = self.server.nodes
-        bc = self.server.bc
+        #nodes = self.server.nodes
+        #bc = self.server.bc
+        nodes = self.server.q_nodes.get()
+        bc = self.server.q_bc.get()
         if text_obj["type"] == "get_blockchain":
             nodes.append((text_obj["host"], text_obj["port"]))
             json_obj = {}
             json_obj["nodes"] = nodes
-            print(nodes)
+            print("Requested nodes: " + str(nodes))
             json_obj["blockchain"] = bc
-            print(bc)
+            print("Requested blockchain: " + str(bc))
             self.request.sendall(json.dumps(json_obj))
+            q_nodes.put(nodes)
+            q_bc.put(bc)
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
             # TODO: approve vote
+            print("Updated nodes: " + str(nodes))
             bc.append(text_obj["vote"])
-            print(bc)
+            print("Updated bc: " + str(bc))
+            q_nodes.put(nodes)
+            q_bc.put(bc)
 
-def start_server(host, port):
+def start_server(host, port, q_nodes, q_bc):
     """
     start (single threaded) server - receive connections
     """
@@ -43,12 +54,13 @@ def start_server(host, port):
         (host, port),
         ConnectionHandler,
     )
-    server.nodes = nodes
-    server.bc = bc
+    #server.nodes = q_nodes.get()
+    #server.bc = q_bc.get()
+    server.q_nodes = q_nodes
+    server.q_bc = q_bc
     server.serve_forever()
 
 def send_blockchain_to_network(b, nodes):
-    print(nodes)
     for i in range(0, len(nodes)-1):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((nodes[i][0], nodes[i][1]))
@@ -57,7 +69,7 @@ def send_blockchain_to_network(b, nodes):
         s.sendall(json.dumps(data))
         s.close()
 
-def start_client(myHost, myPort, destHost, destPort):
+def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
     """
     start client - create connections
     """
@@ -74,12 +86,15 @@ def start_client(myHost, myPort, destHost, destPort):
     r_data = json.loads(r)
     nodes = r_data.get("nodes")[:]
     bc = (r_data.get("blockchain"))
-    print(bc)
     b = next_block_from_array(bc[-1]).block_to_array()
     bc.append(b)
+    print("client recieved bc: " + str(bc))
+    print("client recieved nodes: " + str(nodes))
 
     s.close()
     
+    q_nodes.put(nodes)
+    q_bc.put(bc)
     send_blockchain_to_network(b, nodes)
 
 def main():
@@ -94,7 +109,7 @@ def main():
     nodes.append((host, port))
 
     server_t = threading.Thread(
-        target=start_server, args=(host, port)
+        target=start_server, args=(host, port, q_nodes, q_bc)
     )
     server_t.daemon = True
     server_t.start()
@@ -103,11 +118,13 @@ def main():
     if genesis:
         b = createGenesisBlock()
         bc.append(b.block_to_array())
+        q_bc.put(bc)
+        q_nodes.put(nodes)
     else:
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
         client_t = threading.Thread(
-            target=start_client, args=(host, port, dHost, dPort),
+            target=start_client, args=(host, port, dHost, dPort, q_nodes, q_bc),
         )
         client_t.daemon = True
         client_t.start()
