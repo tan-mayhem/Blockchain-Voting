@@ -91,7 +91,7 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     # Show candidates 
     candidateNames = r_data.get("candidateNames")[:] 
     print "The candidates are : " 
-    for p in range(0,n):
+    for p in range(len(candidateNames)):
             print str(p+1) + ". "  + candidateNames[p] 	
 
     nodes = r_data.get("nodes")[:]
@@ -109,6 +109,7 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     else:
         print("Warning: you are not a valid voter")
         sys.exit()
+    print("Please wait for other voters...\nPress ctrl-c when election ends.")
 
 def checkwinner(names):
 	bc = q_bc.get() 
@@ -164,6 +165,7 @@ def main():
         else:
             print("Warning: you are not a valid voter")
             sys.exit()
+        print("Please wait for other voters...\nPress ctrl-c when election ends.")
     else:
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
