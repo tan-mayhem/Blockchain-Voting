@@ -1,8 +1,7 @@
 import hashlib
 import time
 import datetime as date
-from ctypes import string_at
-from binascii import hexlify
+from userauth import create, enter
 
 class Block:
     def __init__(self, index, timeStamp, voterId, voterPassword, vote, previousHash):
@@ -21,33 +20,39 @@ class Block:
 def createGenesisBlock():
     voterId = raw_input("Enter your Voter ID: ")
     voterPassword = raw_input("Enter your password: ")
-    time.sleep(1)
-    print "Candidates for the House"
-    print "Index " + " Name "
-    print "1. " + " Person 1 "
-    print "2. " + " Person 2 "
-    print "3. " + " Person 3 "
-    print "4. " + " Person 4 "
-    print "5. " + " Person 5 "
-    vote = raw_input("Enter your vote: ")
-    return Block(0, date.datetime.now(), voterId, voterPassword, vote, "0")
+    flag = enter(voterId, voterPassword)
+    if flag == True:
+        print "Candidates for the House"
+        print "Index " + " Name "
+        print "1. " + " Person 1 "
+        print "2. " + " Person 2 "
+        print "3. " + " Person 3 "
+        print "4. " + " Person 4 "
+        print "5. " + " Person 5 "
+        vote = raw_input("Enter your vote: ")
+        return Block(0, date.datetime.now(), voterId, voterPassword, vote, "0")
+    else:
+        print "Incorrect Credentials"
 
 def next_block(last_block):
     voterId = raw_input("Enter your Voter ID: ")
     voterPassword = raw_input("Enter your password: ")
-    time.sleep(1)
-    print "Candidates for the House"
-    print "Index " + " Name "
-    print "1. " + " Person 1 "
-    print "2. " + " Person 2 "
-    print "3. " + " Person 3 "
-    print "4. " + " Person 4 "
-    print "5. " + " Person 5 "
-    vote = raw_input("Enter your vote: ")
-    this_index = last_block.index + 1
-    this_timestamp = date.datetime.now()
-    previousHash = last_block.currentHash
-    return Block(this_index, this_timestamp, voterId, voterPassword, vote, previousHash)
+    flag = enter(voterId, voterPassword)
+    if flag == True:
+        print "Candidates for the House"
+        print "Index " + " Name "
+        print "1. " + " Person 1 "
+        print "2. " + " Person 2 "
+        print "3. " + " Person 3 "
+        print "4. " + " Person 4 "
+        print "5. " + " Person 5 "
+        vote = raw_input("Enter your vote: ")
+        this_index = last_block.index + 1
+        this_timestamp = date.datetime.now()
+        previousHash = last_block.currentHash
+        return Block(this_index, this_timestamp, voterId, voterPassword, vote, previousHash)
+    else:
+        print "Incorrect Credentials"
 
 blockchain = []
 blockchain.append(createGenesisBlock())
