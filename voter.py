@@ -37,17 +37,13 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
             nodes.append((text_obj["host"], text_obj["port"]))
             json_obj = {}
             json_obj["nodes"] = nodes
-            print("Requested nodes: " + str(nodes))
             json_obj["blockchain"] = bc
-            print("Requested blockchain: " + str(bc))
             json_obj["candidateNames"] = candidateNames
             self.request.sendall(json.dumps(json_obj))
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
             if enter(text_obj["vote"][1], text_obj["vote"][2], bc):
-                print("Updated nodes: " + str(nodes))
                 bc.append(text_obj["vote"])
-                print("Updated bc: " + str(bc))
             else:
                 print("Warning: invalid user submitted vote. Not adding to blockchain...")
         q_nodes.put(nodes)
@@ -97,8 +93,6 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     bc.append(b)
 
     if enter(b[1], b[2], bc):
-        print("client recieved bc: " + str(bc))
-        print("client recieved nodes: " + str(nodes))
         candidateNames = r_data.get("candidateNames")[:]
 
         s.close()
@@ -129,7 +123,6 @@ def initializecandidates():
 	n = input("Enter the number of candidates : ")
 	for l in range(n):
 		winnerarr.append(0)
-	print winnerarr
 	for m in range(0,n):
 		bleh = str(raw_input("candidate number " + str(m) + "\'s name : "))
 		candidateNames.append(bleh)
