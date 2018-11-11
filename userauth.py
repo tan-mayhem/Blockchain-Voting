@@ -26,7 +26,17 @@ def enter():
                 return True
         return False
 
-def verifyUser(username, password):
+def verifyUser(username, password, bc):
+    # Verify count
+    count = 0
+    for i in range(len(bc)):
+        if bc[i][1] == username:
+            if count >= 1:
+                return False
+            else:
+                count += 1
+
+    # Verify uid and password
     enc_pass = base64.encodestring(password)
     with open("userpass.txt","r") as f:
         for line in f:
