@@ -10,6 +10,7 @@ import json
 import Queue
 
 from blockchain import Block, createGenesisBlock, next_block_from_array
+from userauth import verifyUser
 
 bc = list()
 q_bc = Queue.Queue()
@@ -23,15 +24,12 @@ q_cand = Queue.Queue()
 #for i in range(5) :
 #	winnerarr.append(0)
 
-
 class ConnectionHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         # Add connected host and port to list of clients
         text = self.request.recv(1024).strip()
         text_obj = json.loads(text)
 
-        #nodes = self.server.nodes
-        #bc = self.server.bc
         nodes = self.server.q_nodes.get()
         bc = self.server.q_bc.get()
         candidateNames = self.server.q_cand.get()
@@ -46,10 +44,12 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
             self.request.sendall(json.dumps(json_obj))
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
-            # TODO: approve vote
-            print("Updated nodes: " + str(nodes))
-            bc.append(text_obj["vote"])
-            print("Updated bc: " + str(bc))
+            if verifyUser(text_obj["vote"][1], text_obj["vote"][2], bc):
+                print("Updated nodes: " + str(nodes))
+                bc.append(text_obj["vote"])
+                print("Updated bc: " + str(bc))
+            else:
+                print("Warning: invalid user submitted vote. Not adding to blockchain...")
         q_nodes.put(nodes)
         q_bc.put(bc)
         q_cand.put(candidateNames)
@@ -62,8 +62,6 @@ def start_server(host, port, q_nodes, q_bc, q_cand):
         (host, port),
         ConnectionHandler,
     )
-    #server.nodes = q_nodes.get()
-    #server.bc = q_bc.get()
     server.q_nodes = q_nodes
     server.q_bc = q_bc
     server.q_cand = q_cand
@@ -97,16 +95,21 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     bc = (r_data.get("blockchain"))
     b = next_block_from_array(bc[-1]).block_to_array()
     bc.append(b)
-    print("client recieved bc: " + str(bc))
-    print("client recieved nodes: " + str(nodes))
-    candidateNames = r_data.get("candidateNames")[:]
 
-    s.close()
-    
-    q_nodes.put(nodes)
-    q_bc.put(bc)
-    q_cand.put(candidateNames)
-    send_blockchain_to_network(b, nodes)
+    if verifyUser(b[1], b[2], bc):
+        print("client recieved bc: " + str(bc))
+        print("client recieved nodes: " + str(nodes))
+        candidateNames = r_data.get("candidateNames")[:]
+
+        s.close()
+        
+        q_nodes.put(nodes)
+        q_bc.put(bc)
+        q_cand.put(candidateNames)
+        send_blockchain_to_network(b, nodes)
+    else:
+        print("Warning: you are not a valid voter")
+        sys.exit()
 
 def checkwinner(names):
 	bc = q_bc.get() 
@@ -114,11 +117,11 @@ def checkwinner(names):
 		a = int(bc[i][3]) - 1
 		winnerarr[a] = winnerarr[a] + 1
 	max = -1
-        winner = -1
+  winner = -1
 	for j in range(0,len(winnerarr)):
 		if winnerarr[j] > max:
-			max = winnerarr[j]
-                        winner = j
+		  max = winnerarr[j]
+      winner = j
 
 	print "The winner is candidate number : " + str((winner+1))  + " Namely : " + names[winner] 
 
@@ -136,7 +139,7 @@ def initializecandidates():
         q_cand.put(candidateNames)
 
 def main():
-    host = "localhost"
+    host = "localhost" 
     port = None
     if len(sys.argv) == 2:
         port = int(sys.argv[1])
@@ -154,11 +157,15 @@ def main():
 
     genesis = str(raw_input("Are you genesis? [y/N] ")) == "y"
     if genesis:
-    	initializecandidates()
-        b = createGenesisBlock()
-        bc.append(b.block_to_array())
-        q_bc.put(bc)
-        q_nodes.put(nodes)
+        initializecandidates()
+        b = createGenesisBlock().block_to_array()
+        bc.append(b)
+        if verifyUser(b[1], b[2], bc):
+            q_bc.put(bc)
+            q_nodes.put(nodes)
+        else:
+            print("Warning: you are not a valid voter")
+            sys.exit()
     else:
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
