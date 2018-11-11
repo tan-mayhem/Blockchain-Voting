@@ -16,6 +16,10 @@ q_bc = Queue.Queue()
 
 nodes = list()
 q_nodes = Queue.Queue()
+winnerarr = [] 
+for i in range(5) :
+	winnerarr.append(0)
+
 
 class ConnectionHandler(SocketServer.BaseRequestHandler):
     def handle(self):
@@ -97,6 +101,20 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
     q_bc.put(bc)
     send_blockchain_to_network(b, nodes)
 
+def checkwinner():
+	bc = q_bc.get() 
+	for i in range(0,len(bc)):
+		a = int(bc[i][3]) - 1
+		winnerarr[a] = winnerarr[a] + 1
+	print winnerarr
+	max = -1
+	for j in range(0,len(winnerarr)):
+		if winnerarr[j] > max:
+			max = j 
+	print "The winner is candidate : " + str((max+1)) 
+
+
+
 def main():
     host = "localhost"
     port = None
@@ -135,6 +153,9 @@ def main():
         	time.sleep(1) ;
     except KeyboardInterrupt:
         pass
+
+    checkwinner()
+
 
 if __name__ == "__main__":
         main()
