@@ -16,8 +16,10 @@ q_bc = Queue.Queue()
 
 nodes = list()
 q_nodes = Queue.Queue()
+
 winnerarr = [] 
-CandidateNames = []
+candidateNames = []
+q_cand = Queue.Queue()
 #for i in range(5) :
 #	winnerarr.append(0)
 
@@ -32,6 +34,7 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
         #bc = self.server.bc
         nodes = self.server.q_nodes.get()
         bc = self.server.q_bc.get()
+        candidateNames = self.server.q_cand.get()
         if text_obj["type"] == "get_blockchain":
             nodes.append((text_obj["host"], text_obj["port"]))
             json_obj = {}
@@ -39,19 +42,19 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
             print("Requested nodes: " + str(nodes))
             json_obj["blockchain"] = bc
             print("Requested blockchain: " + str(bc))
+            json_obj["candidateNames"] = candidateNames
             self.request.sendall(json.dumps(json_obj))
-            q_nodes.put(nodes)
-            q_bc.put(bc)
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
             # TODO: approve vote
             print("Updated nodes: " + str(nodes))
             bc.append(text_obj["vote"])
             print("Updated bc: " + str(bc))
-            q_nodes.put(nodes)
-            q_bc.put(bc)
+        q_nodes.put(nodes)
+        q_bc.put(bc)
+        q_cand.put(candidateNames)
 
-def start_server(host, port, q_nodes, q_bc):
+def start_server(host, port, q_nodes, q_bc, q_cand):
     """
     start (single threaded) server - receive connections
     """
@@ -63,6 +66,7 @@ def start_server(host, port, q_nodes, q_bc):
     #server.bc = q_bc.get()
     server.q_nodes = q_nodes
     server.q_bc = q_bc
+    server.q_cand = q_cand
     server.serve_forever()
 
 def send_blockchain_to_network(b, nodes):
@@ -74,7 +78,7 @@ def send_blockchain_to_network(b, nodes):
         s.sendall(json.dumps(data))
         s.close()
 
-def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
+def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     """
     start client - create connections
     """
@@ -95,26 +99,28 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
     bc.append(b)
     print("client recieved bc: " + str(bc))
     print("client recieved nodes: " + str(nodes))
+    candidateNames = r_data.get("candidateNames")[:]
 
     s.close()
     
     q_nodes.put(nodes)
     q_bc.put(bc)
+    q_cand.put(candidateNames)
     send_blockchain_to_network(b, nodes)
 
-def checkwinner():
+def checkwinner(names):
 	bc = q_bc.get() 
 	for i in range(0,len(bc)):
 		a = int(bc[i][3]) - 1
-		print a
-		print len(winnerarr)
 		winnerarr[a] = winnerarr[a] + 1
-	print winnerarr
 	max = -1
+        winner = -1
 	for j in range(0,len(winnerarr)):
 		if winnerarr[j] > max:
-			max = j 
-	print "The winner is candidate number : " + str((max+1))  + " Namely : " + CandidateNames[max] 
+			max = winnerarr[j]
+                        winner = j
+
+	print "The winner is candidate number : " + str((winner+1))  + " Namely : " + names[winner] 
 
 def initializecandidates():
 	n = input("Enter the number of candidates : ")
@@ -122,13 +128,12 @@ def initializecandidates():
 		winnerarr.append(0)
 	print winnerarr
 	for m in range(0,n):
-		bleh = str(raw_input("Candidate number " + str(m) + "\'s name : "))
-		CandidateNames.append(bleh)
-	print "The Candidates are : " 
+		bleh = str(raw_input("candidate number " + str(m) + "\'s name : "))
+		candidateNames.append(bleh)
+	print "The candidates are : " 
 	for p in range(0,n):
-		print str(p+1) + ". "  + CandidateNames[p] 	
-
-
+		print str(p+1) + ". "  + candidateNames[p] 	
+        q_cand.put(candidateNames)
 
 def main():
     host = "localhost"
@@ -142,7 +147,7 @@ def main():
     nodes.append((host, port))
 
     server_t = threading.Thread(
-        target=start_server, args=(host, port, q_nodes, q_bc)
+        target=start_server, args=(host, port, q_nodes, q_bc, q_cand)
     )
     server_t.daemon = True
     server_t.start()
@@ -158,7 +163,7 @@ def main():
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
         client_t = threading.Thread(
-            target=start_client, args=(host, port, dHost, dPort, q_nodes, q_bc),
+            target=start_client, args=(host, port, dHost, dPort, q_nodes, q_bc, q_cand),
         )
         client_t.daemon = True
         client_t.start()
@@ -170,7 +175,10 @@ def main():
     except KeyboardInterrupt:
         pass
 
-    checkwinner()
+    candidateNames = q_cand.get()
+    for i in range(len(candidateNames)):
+            winnerarr.append(0)
+    checkwinner(candidateNames)
 
 
 if __name__ == "__main__":
