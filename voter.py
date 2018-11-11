@@ -117,11 +117,11 @@ def checkwinner(names):
 		a = int(bc[i][3]) - 1
 		winnerarr[a] = winnerarr[a] + 1
 	max = -1
-  winner = -1
+        winner = -1
 	for j in range(0,len(winnerarr)):
-		if winnerarr[j] > max:
-		  max = winnerarr[j]
-      winner = j
+	    if winnerarr[j] > max:
+                max = winnerarr[j]
+                winner = j
 
 	print "The winner is candidate number : " + str((winner+1))  + " Namely : " + names[winner] 
 
