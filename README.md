@@ -10,7 +10,7 @@ Blockchain voting project for Madhacks 2018
 # Instructions:
 1. Install packages and other dependencies,
 
-   pip install pyrebase
+   pip install pyrebase,
              
    pip install firebase-admin
              
