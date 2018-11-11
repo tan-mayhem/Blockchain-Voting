@@ -94,6 +94,9 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
 
     if enter(b[1], b[2], bc):
         candidateNames = r_data.get("candidateNames")[:]
+	for m in range(len(candidateNames)):
+		bleh = str(raw_input("candidate number " + str(m) + "\'s name : "))
+		candidateNames.append(bleh)
 
         s.close()
         
