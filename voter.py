@@ -17,8 +17,9 @@ q_bc = Queue.Queue()
 nodes = list()
 q_nodes = Queue.Queue()
 winnerarr = [] 
-for i in range(5) :
-	winnerarr.append(0)
+CandidateNames = []
+#for i in range(5) :
+#	winnerarr.append(0)
 
 
 class ConnectionHandler(SocketServer.BaseRequestHandler):
@@ -105,13 +106,27 @@ def checkwinner():
 	bc = q_bc.get() 
 	for i in range(0,len(bc)):
 		a = int(bc[i][3]) - 1
+		print a
+		print len(winnerarr)
 		winnerarr[a] = winnerarr[a] + 1
 	print winnerarr
 	max = -1
 	for j in range(0,len(winnerarr)):
 		if winnerarr[j] > max:
 			max = j 
-	print "The winner is candidate : " + str((max+1)) 
+	print "The winner is candidate number : " + str((max+1))  + " Namely : " + CandidateNames[max] 
+
+def initializecandidates():
+	n = input("Enter the number of candidates : ")
+	for l in range(n):
+		winnerarr.append(0)
+	print winnerarr
+	for m in range(0,n):
+		bleh = str(raw_input("Candidate number " + str(m) + "\'s name : "))
+		CandidateNames.append(bleh)
+	print "The Candidates are : " 
+	for p in range(0,n):
+		print str(p+1) + ". "  + CandidateNames[p] 	
 
 
 
@@ -134,6 +149,7 @@ def main():
 
     genesis = str(raw_input("Are you genesis? [y/N] ")) == "y"
     if genesis:
+    	initializecandidates()
         b = createGenesisBlock()
         bc.append(b.block_to_array())
         q_bc.put(bc)
