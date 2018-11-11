@@ -37,7 +37,7 @@ def enter(voterId, voterPassword, bc):
     # Verify count
     count = 0
     for i in range(len(bc)):
-        if bc[i][1] == username:
+        if bc[i][1] == voterId:
             if count >= 1:
                 return False
             else:
