@@ -10,6 +10,7 @@ import json
 import Queue
 
 from blockchain import Block, createGenesisBlock, next_block_from_array
+from userauth import verifyUser
 
 bc = list()
 q_bc = Queue.Queue()
@@ -23,8 +24,6 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
         text = self.request.recv(1024).strip()
         text_obj = json.loads(text)
 
-        #nodes = self.server.nodes
-        #bc = self.server.bc
         nodes = self.server.q_nodes.get()
         bc = self.server.q_bc.get()
         if text_obj["type"] == "get_blockchain":
@@ -40,6 +39,7 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
             # TODO: approve vote
+            print(verifyUser(text_obj["vote"][1], text_obj["vote"][2]))
             print("Updated nodes: " + str(nodes))
             bc.append(text_obj["vote"])
             print("Updated bc: " + str(bc))
@@ -54,8 +54,6 @@ def start_server(host, port, q_nodes, q_bc):
         (host, port),
         ConnectionHandler,
     )
-    #server.nodes = q_nodes.get()
-    #server.bc = q_bc.get()
     server.q_nodes = q_nodes
     server.q_bc = q_bc
     server.serve_forever()
@@ -98,7 +96,7 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
     send_blockchain_to_network(b, nodes)
 
 def main():
-    host = "localhost"
+    host = "localhost" 
     port = None
     if len(sys.argv) == 2:
         port = int(sys.argv[1])
@@ -124,7 +122,7 @@ def main():
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
         client_t = threading.Thread(
-            target=start_client, args=(host, port, dHost, dPort, q_nodes, q_bc),
+            target=start_client, args=(host, port, dHost, dPort,  q_nodes, q_bc),
         )
         client_t.daemon = True
         client_t.start()

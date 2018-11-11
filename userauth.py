@@ -25,11 +25,24 @@ def enter():
             if line.split(",")[0] == up_username and line.split(",")[1] == enc_pass:
                 return True
         return False
-choice = str(raw_input("Add new usernames/passwords or login --> Enter [1 or 2]"))
-if choice=="1":  
-    create()
-else:
-    if enter():
-        print("Logged in!")
+
+def verifyUser(username, password):
+    enc_pass = base64.encodestring(password)
+    with open("userpass.txt","r") as f:
+        for line in f:
+            if line.split(",")[0] == username and line.split(",")[1] == enc_pass:
+                return True
+        return False
+
+def main():
+    choice = str(raw_input("Add new usernames/passwords or login --> Enter [1 or 2]"))
+    if choice=="1":  
+        create()
     else:
-        print("Incorrect!")
+        if enter():
+            print("Logged in!")
+        else:
+            print("Incorrect!")
+
+if __name__ == "__main__":
+    main()
