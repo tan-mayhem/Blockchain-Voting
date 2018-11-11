@@ -10,7 +10,7 @@ import json
 import Queue
 
 from blockchain import Block, createGenesisBlock, next_block_from_array
-from userauth import verifyUser
+from userauth import enter
 
 bc = list()
 q_bc = Queue.Queue()
@@ -44,7 +44,7 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
             self.request.sendall(json.dumps(json_obj))
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
-            if verifyUser(text_obj["vote"][1], text_obj["vote"][2], bc):
+            if enter(text_obj["vote"][1], text_obj["vote"][2], bc):
                 print("Updated nodes: " + str(nodes))
                 bc.append(text_obj["vote"])
                 print("Updated bc: " + str(bc))
@@ -96,7 +96,7 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc, q_cand):
     b = next_block_from_array(bc[-1]).block_to_array()
     bc.append(b)
 
-    if verifyUser(b[1], b[2], bc):
+    if enter(b[1], b[2], bc):
         print("client recieved bc: " + str(bc))
         print("client recieved nodes: " + str(nodes))
         candidateNames = r_data.get("candidateNames")[:]
@@ -160,7 +160,7 @@ def main():
         initializecandidates()
         b = createGenesisBlock().block_to_array()
         bc.append(b)
-        if verifyUser(b[1], b[2], bc):
+        if enter(b[1], b[2], bc):
             q_bc.put(bc)
             q_nodes.put(nodes)
         else:

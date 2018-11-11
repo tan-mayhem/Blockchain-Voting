@@ -32,8 +32,16 @@ def create():
     })
 """
 
-def enter(voterId, voterPassword):
+def enter(voterId, voterPassword, bc):
     encodedPassword = base64.encodestring(voterPassword)
+    # Verify count
+    count = 0
+    for i in range(len(bc)):
+        if bc[i][1] == username:
+            if count >= 1:
+                return False
+            else:
+							count += 1
 
     config = {
       'apiKey': 'AIzaSyBXQCdlBopceWbLcXV5lMAvoB1zoO8aOmg',
@@ -49,9 +57,7 @@ def enter(voterId, voterPassword):
     all_voters = db.child("voters").get()
     for voter in all_voters.each():
         vId = voter.val()['voterid']
-        print vId
         vPs = voter.val()['password']
-        print vPs
         if voterId == vId and voterPassword == vPs:
             k = 1
             break
