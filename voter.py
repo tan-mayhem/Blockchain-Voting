@@ -34,17 +34,16 @@ class ConnectionHandler(SocketServer.BaseRequestHandler):
             json_obj["blockchain"] = bc
             print("Requested blockchain: " + str(bc))
             self.request.sendall(json.dumps(json_obj))
-            q_nodes.put(nodes)
-            q_bc.put(bc)
         elif text_obj["type"] == "add_vote":
             nodes = text_obj["nodes"][:]
-            # TODO: approve vote
-            print(verifyUser(text_obj["vote"][1], text_obj["vote"][2]))
-            print("Updated nodes: " + str(nodes))
-            bc.append(text_obj["vote"])
-            print("Updated bc: " + str(bc))
-            q_nodes.put(nodes)
-            q_bc.put(bc)
+            if verifyUser(text_obj["vote"][1], text_obj["vote"][2]):
+                print("Updated nodes: " + str(nodes))
+                bc.append(text_obj["vote"])
+                print("Updated bc: " + str(bc))
+            else:
+                print("Warning: invalid user submitted vote. Not adding to blockchain...")
+        q_nodes.put(nodes)
+        q_bc.put(bc)
 
 def start_server(host, port, q_nodes, q_bc):
     """
@@ -85,15 +84,19 @@ def start_client(myHost, myPort, destHost, destPort, q_nodes, q_bc):
     nodes = r_data.get("nodes")[:]
     bc = (r_data.get("blockchain"))
     b = next_block_from_array(bc[-1]).block_to_array()
-    bc.append(b)
-    print("client recieved bc: " + str(bc))
-    print("client recieved nodes: " + str(nodes))
+    if verifyUser(b[1], b[2]):
+        bc.append(b)
+        print("client recieved bc: " + str(bc))
+        print("client recieved nodes: " + str(nodes))
 
-    s.close()
-    
-    q_nodes.put(nodes)
-    q_bc.put(bc)
-    send_blockchain_to_network(b, nodes)
+        s.close()
+        
+        q_nodes.put(nodes)
+        q_bc.put(bc)
+        send_blockchain_to_network(b, nodes)
+    else:
+        print("Warning: you are not a valid voter")
+        exit()
 
 def main():
     host = "localhost" 
@@ -114,10 +117,14 @@ def main():
 
     genesis = str(raw_input("Are you genesis? [y/N] ")) == "y"
     if genesis:
-        b = createGenesisBlock()
-        bc.append(b.block_to_array())
-        q_bc.put(bc)
-        q_nodes.put(nodes)
+        b = createGenesisBlock().block_to_array()
+        if verifyUser(b[1], b[2]):
+            bc.append(b)
+            q_bc.put(bc)
+            q_nodes.put(nodes)
+        else:
+            print("Warning: you are not a valid voter")
+            exit()
     else:
         dHost = raw_input("Other host: ")
         dPort = int(raw_input("Other port: "))
